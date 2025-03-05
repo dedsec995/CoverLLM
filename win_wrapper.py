@@ -59,7 +59,8 @@ def run_app():
     print("Launching the app...")
     if os.name == "nt":
         activate_cmd = r"venv\Scripts\activate.bat"
-        streamlit_cmd = f"{activate_cmd} && streamlit run app.py"
+        app_path = get_resource_path("requirements.txt")
+        streamlit_cmd = f"{activate_cmd} && streamlit run {app_path}"
         run_command(streamlit_cmd, shell=True)
 
 if __name__ == "__main__":
