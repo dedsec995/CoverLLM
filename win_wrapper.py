@@ -4,6 +4,12 @@ import sys
 
 SETUP_FLAG = ".setup_done"
 
+def is_command_available(command):
+    """Check if a command is available on the system PATH."""
+    result = subprocess.run(["where" if os.name == "nt" else "which", command],
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return result.returncode == 0
+
 def run_command(command, shell=False):
     try:
         result = subprocess.run(command, shell=shell, check=True)
@@ -11,17 +17,26 @@ def run_command(command, shell=False):
     except subprocess.CalledProcessError as e:
         print(f"Error running command: {e}")
         sys.exit(1)
+    except FileNotFoundError as e:
+        print(f"Command not found: {e}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        sys.exit(1)
 
 def run_setup():
     print("Running first-time setup...")
 
-    if not run_command(["where", "python"]):
+    if not is_command_available("python"):
         print("Python not found. Please install Python from https://www.python.org/downloads/")
         sys.exit(1)
 
-    if not run_command(["ollama", "--version"]):
+    if not is_command_available("ollama"):
         print("Ollama not found. Install Ollama from https://ollama.com/download/")
-            sys.exit(1)
+        sys.exit(1)
+    else:
+        print("Ollama is installed. Pulling deepseek-r1 model...")
+        run_command(["ollama", "pull", "deepseek-r1"])
 
     if not os.path.exists("venv"):
         run_command(["python", "-m", "venv", "venv"])
