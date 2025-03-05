@@ -2,6 +2,10 @@ import os
 import subprocess
 import sys
 
+# Change working directory to executable's directory if running as compiled
+if getattr(sys, 'frozen', False):
+    os.chdir(os.path.dirname(sys.executable))
+
 SETUP_FLAG = ".setup_done"
 
 def is_command_available(command):
@@ -59,7 +63,7 @@ def run_app():
     print("Launching the app...")
     if os.name == "nt":
         activate_cmd = r"venv\Scripts\activate.bat"
-        app_path = get_resource_path("requirements.txt")
+        app_path = get_resource_path("app.py")
         streamlit_cmd = f"{activate_cmd} && streamlit run {app_path}"
         run_command(streamlit_cmd, shell=True)
 
