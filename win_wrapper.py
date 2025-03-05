@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import time
 
 SETUP_FLAG = ".setup_done"
 
@@ -16,6 +17,7 @@ def run_command(command, shell=False):
         return result.returncode == 0
     except subprocess.CalledProcessError as e:
         print(f"Error running command: {e}")
+        time.sleep(10)
         sys.exit(1)
     except FileNotFoundError as e:
         print(f"Command not found: {e}")
@@ -29,10 +31,12 @@ def run_setup():
 
     if not is_command_available("python"):
         print("Python not found. Please install Python from https://www.python.org/downloads/")
+        time.sleep(10)
         sys.exit(1)
 
     if not is_command_available("ollama"):
         print("Ollama not found. Install Ollama from https://ollama.com/download/")
+        time.sleep(10)
         sys.exit(1)
     else:
         print("Ollama is installed. Pulling deepseek-r1 model...")
