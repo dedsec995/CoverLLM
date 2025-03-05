@@ -2,20 +2,14 @@ import os
 import subprocess
 import sys
 
-# Change working directory to executable's directory if running as compiled
-if getattr(sys, 'frozen', False):
-    os.chdir(os.path.dirname(sys.executable))
-
 SETUP_FLAG = ".setup_done"
 
 def is_command_available(command):
-    """Check if a command is available on the system PATH."""
     result = subprocess.run(["where" if os.name == "nt" else "which", command],
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return result.returncode == 0
 
 def get_resource_path(relative_path):
-    """ Get absolute path to resource, works for dev and for PyInstaller. """
     base_path = getattr(sys, '_MEIPASS', os.path.abspath("."))
     return os.path.join(base_path, relative_path)
 

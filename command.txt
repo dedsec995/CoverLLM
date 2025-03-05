@@ -1,0 +1,1 @@
+pyinstaller --onefile --add-data "requirements.txt;." --add-data "app.py;." --add-data "utils.py;." --hidden-import "streamlit" win_wrapper.py
