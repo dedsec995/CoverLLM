@@ -14,9 +14,12 @@ if not os.path.exists(json_file):
     name = st.text_input("Enter your name:")
     email = st.text_input("Enter your email:")
     website = st.text_input("Enter your portfolio website:")
+    address = st.text_area("Enter the address (use new lines for each line):\n", placeholder="Street Name\nCity, STATE Initials ZIP\nMobile Number")    
     if st.button("Save Details"):
-        if name and email and website:
-            data = {"name": name, "email": email, "website": website, "content": ""}
+        if name and email and website and address:
+            formatted_address = address.replace('\n', '<br/>')
+            formatted_address += "<br/>"
+            data = {"name": name, "email": email, "website": website, "content": "", "address": formatted_address}
             with open(json_file, "w") as file:
                 json.dump(data, file, indent=4)
             st.success("Details saved! Redirecting.....")
@@ -56,7 +59,8 @@ if "cover_letter" not in st.session_state:
 if st.button("Generate Cover Letter"):
     if company_name and job_title and job_description:
         if data.get("content"):
-            with com.iframe("https://lottie.host/embed/340142c6-d731-49c1-9342-a9f69626b3e9/qFKZwJuPOV.lottie"):
+            com.iframe("https://lottie.host/embed/340142c6-d731-49c1-9342-a9f69626b3e9/qFKZwJuPOV.lottie")
+            with st.spinner("Generating cover letter text..."):
                 st.session_state.cover_letter = generate_cover_letter(job_description, company_name, job_title, data["content"])
             st.success("Cover letter generated! You can now edit it below.")
         else:
@@ -70,9 +74,10 @@ if st.session_state.cover_letter:
     )
 
     if st.button("Create PDF"):
-        with com.iframe("https://lottie.host/embed/0d0a0589-b6c1-41a8-a690-08a0f70f753c/OMqTFrrEAY.lottie"):
+        com.iframe("https://lottie.host/embed/0d0a0589-b6c1-41a8-a690-08a0f70f753c/OMqTFrrEAY.lottie")
+        with st.spinner("Generating cover letter PDF..."):
             try:
-                time.sleep(10)
+                time.sleep(2)
                 create_cover_letter_pdf(edited_cover_letter, job_title, company_name, data)
                 st.success("Cover letter PDF created successfully!")
 
