@@ -1,7 +1,6 @@
 import os
 import subprocess
 import sys
-import time
 
 SETUP_FLAG = ".setup_done"
 
@@ -11,13 +10,17 @@ def is_command_available(command):
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return result.returncode == 0
 
+def get_resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller. """
+    base_path = getattr(sys, '_MEIPASS', os.path.abspath("."))
+    return os.path.join(base_path, relative_path)
+
 def run_command(command, shell=False):
     try:
         result = subprocess.run(command, shell=shell, check=True)
         return result.returncode == 0
     except subprocess.CalledProcessError as e:
         print(f"Error running command: {e}")
-        time.sleep(10)
         sys.exit(1)
     except FileNotFoundError as e:
         print(f"Command not found: {e}")
@@ -31,12 +34,10 @@ def run_setup():
 
     if not is_command_available("python"):
         print("Python not found. Please install Python from https://www.python.org/downloads/")
-        time.sleep(10)
         sys.exit(1)
 
     if not is_command_available("ollama"):
         print("Ollama not found. Install Ollama from https://ollama.com/download/")
-        time.sleep(10)
         sys.exit(1)
     else:
         print("Ollama is installed. Pulling deepseek-r1 model...")
@@ -47,7 +48,8 @@ def run_setup():
 
     if os.name == "nt":  # Windows
         activate_cmd = r"venv\Scripts\activate.bat"
-        pip_install_cmd = f"{activate_cmd} && pip install -r requirements.txt"
+        requirements_path = get_resource_path("requirements.txt")
+        pip_install_cmd = f"{activate_cmd} && pip install -r {requirements_path}"
         run_command(pip_install_cmd, shell=True)
     
     with open(SETUP_FLAG, "w") as f:

@@ -6,6 +6,7 @@ from utils import extract_text_from_pdf, generate_cover_letter, create_cover_let
 import os, time
 
 json_file = "details.json"
+os.makedirs("coverLetter",exist_ok=True)
 
 # Check if details.json exists
 if not os.path.exists(json_file):
