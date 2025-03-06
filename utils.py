@@ -39,7 +39,7 @@ def generate_cover_letter(job_description, company_name, job_title, applicant_in
     Applicant Information:
     {applicant_info}
 
-    Write a small professional cover letter for this job application at {company_name} for {job_title}. Just output the content of the cover lette without header and footer.
+    Write a small professional cover letter of 3 paragraphs at {company_name} for {job_title}. I just want paragraphs without header or footer.
     """
 
     response = ollama.chat(
@@ -51,7 +51,10 @@ def generate_cover_letter(job_description, company_name, job_title, applicant_in
             },
         ],
     )
-    return response["message"]["content"].strip()
+    raw_content = response["message"]["content"].strip()
+    match = re.search(r"</think>(.*)", raw_content, re.DOTALL)
+    cleaned_content = match.group(1).strip() if match else raw_content
+    return cleaned_content
 
 
 def create_cover_letter_pdf(content, job_title, company_name, data):
@@ -155,9 +158,7 @@ def create_cover_letter_pdf(content, job_title, company_name, data):
     # Left: fixed date ("2 Feb 2025"); Right: address details
     date_text = f"<b>{formatted_date}</b>"
     address_text = (
-        "7 Eaton PL<br/>"
-        "Binghamton, NY 13905<br/>"
-        "(607) 296-9098<br/>"
+        data["address"] +
         f"<a href='mailto:{email}'>{email}</a>"
     )
     date_para = Paragraph(date_text, date_style)
