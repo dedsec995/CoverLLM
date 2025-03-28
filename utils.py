@@ -1,5 +1,5 @@
 # utils.py
-import ollama
+from groq import Groq
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -7,13 +7,12 @@ from reportlab.lib.enums import TA_LEFT, TA_RIGHT
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib import colors
-import json
-import fitz
-import re
-import unicodedata
+import re, os, fitz, json, unicodedata
+from dotenv import load_dotenv
 from datetime import datetime
 current_date = datetime.now()
 
+load_dotenv()
 
 def extract_text_from_pdf(pdf_file):
     text = ""
@@ -42,16 +41,19 @@ def generate_cover_letter(job_description, company_name, job_title, applicant_in
     Write a small professional cover letter of 3 paragraphs at {company_name} for {job_title}. I just want paragraphs without header or footer.
     """
 
-    response = ollama.chat(
-        model="deepseek-r1",
+    client = Groq(
+        api_key=os.environ.get("GROQ_API_KEY"),
+    )
+    response = client.chat.completions.create(
         messages=[
             {
                 "role": "user",
                 "content": prompt,
-            },
+            }
         ],
+        model="deepseek-r1-distill-llama-70b",
     )
-    raw_content = response["message"]["content"].strip()
+    raw_content = response.choices[0].message.content
     match = re.search(r"</think>(.*)", raw_content, re.DOTALL)
     cleaned_content = match.group(1).strip() if match else raw_content
     return cleaned_content
