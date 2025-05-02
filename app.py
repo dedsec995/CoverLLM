@@ -4,9 +4,12 @@ import json
 import streamlit.components.v1 as com
 from utils import extract_text_from_pdf, generate_cover_letter, create_cover_letter_pdf
 import os, time
+from groq import Groq
 
 json_file = "details.json"
 os.makedirs("coverLetter",exist_ok=True)
+
+GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 
 # Check if details.json exists
 if not os.path.exists(json_file):
@@ -37,7 +40,7 @@ with col1:
     st.title("Cover Letter Generator")
 with col2:
     com.iframe("https://lottie.host/embed/5f753811-3ae0-45a4-98a0-89530560eb7d/dfld3ulPRd.lottie", height=100)
-    
+
 company_name = st.text_input("Enter the company name:")
 job_title = st.text_input("Enter the job title:")
 job_description = st.text_area("Enter the job description:")
@@ -61,7 +64,11 @@ if st.button("Generate Cover Letter"):
         if data.get("content"):
             com.iframe("https://lottie.host/embed/340142c6-d731-49c1-9342-a9f69626b3e9/qFKZwJuPOV.lottie")
             with st.spinner("Generating cover letter text..."):
-                st.session_state.cover_letter = generate_cover_letter(job_description, company_name, job_title, data["content"])
+
+                client = Groq(
+                    api_key=GROQ_API_KEY,
+                )
+                st.session_state.cover_letter = generate_cover_letter(client,job_description, company_name, job_title, data["content"])
             st.success("Cover letter generated! You can now edit it below.")
         else:
             st.error("Please upload a resume or add content to details.json.")

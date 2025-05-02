@@ -1,5 +1,4 @@
 # utils.py
-from groq import Groq
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -30,7 +29,7 @@ def extract_text_from_pdf(pdf_file):
     return text
 
 
-def generate_cover_letter(job_description, company_name, job_title, applicant_info):
+def generate_cover_letter(client, job_description, company_name, job_title, applicant_info):
     prompt = f"""
     Job Description:
     {job_description}
@@ -41,9 +40,6 @@ def generate_cover_letter(job_description, company_name, job_title, applicant_in
     Write a small professional cover letter of 3 paragraphs at {company_name} for {job_title}. I just want paragraphs without header or footer.
     """
 
-    client = Groq(
-        api_key=os.environ.get("GROQ_API_KEY"),
-    )
     response = client.chat.completions.create(
         messages=[
             {
