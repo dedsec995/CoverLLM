@@ -6,12 +6,9 @@ from reportlab.lib.enums import TA_LEFT, TA_RIGHT
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib import colors
-import re, os, fitz, json, unicodedata
-from dotenv import load_dotenv
+import re, fitz, unicodedata
 from datetime import datetime
 current_date = datetime.now()
-
-load_dotenv()
 
 def extract_text_from_pdf(pdf_file):
     text = ""
